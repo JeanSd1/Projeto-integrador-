@@ -1,8 +1,10 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Sistema de Chamados</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Chamados - Dashboard Profissional</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
     <style>
         * {
@@ -170,12 +172,16 @@
             opacity: 0.9;
             margin-bottom: 10px;
             font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
 
         .dash-card h2 {
             font-size: 36px;
             font-weight: 700;
             margin: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .blue { 
@@ -193,6 +199,11 @@
 
         .red h2 {
             color: #333;
+        }
+
+        .red h3 {
+            color: #333;
+            opacity: 0.8;
         }
 
         .charts {
@@ -316,11 +327,10 @@
             <button onclick="criarChamado()">✨ CRIAR CHAMADO</button>
         </div>
 
-        <!-- DASHBOARD CARDS -->
         <div class="cards">
             <div class="dash-card blue">
                 <h3>⏱ Tempo Médio</h3>
-                <h2 id="tempoMedio">--</h2>
+                <h2 id="tempoMedio">-- min</h2>
             </div>
 
             <div class="dash-card green">
@@ -334,7 +344,6 @@
             </div>
         </div>
 
-        <!-- GRÁFICOS -->
         <div class="charts">
             <div class="chart-box">
                 <h3>📊 Chamados por Sistema</h3>
@@ -347,7 +356,6 @@
             </div>
         </div>
 
-        <!-- LISTA DE CHAMADOS -->
         <ul>
             <h2>📋 Histórico de Chamados</h2>
             <div id="listaChamados"></div>
@@ -392,7 +400,6 @@ function criarChamado() {
 
     chamados.push(chamado);
     
-    // Limpar formulário
     document.getElementById("nome").value = "";
     document.getElementById("empresa").value = "";
     document.getElementById("impacto").value = "";
