@@ -1,0 +1,3 @@
+comandos 
+
+python sistema-chamados/app.py

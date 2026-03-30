@@ -1,0 +1,286 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Chamados</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fb;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .layout {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #1f2937;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dash-card {
+            flex: 1;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .blue { background: #3b82f6; }
+        .green { background: #10b981; }
+        .red { background: #ef4444; }
+
+        .charts {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chart-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        ul {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            list-style: none;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>🧠 Sistema de Chamados</header>
+
+<div class="layout">
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <p>📋 Chamados</p>
+        <p>📊 Dashboard</p>
+    </div>
+
+    <div class="main">
+
+        <div class="card">
+            <h2>Abrir Chamado</h2>
+
+            <input id="nome" placeholder="Nome">
+            <input id="empresa" placeholder="Empresa">
+
+            <select id="sistema">
+                <option>RHID</option>
+                <option>WPE</option>
+                <option>PTRP</option>
+            </select>
+
+            <select id="tipo">
+                <option>Erro</option>
+                <option>Lentidão</option>
+                <option>Dúvida</option>
+            </select>
+
+            <input type="number" id="impacto" placeholder="Pessoas afetadas">
+            <textarea id="descricao" placeholder="Descrição"></textarea>
+
+            <button onclick="criarChamado()">Criar Chamado</button>
+        </div>
+
+        <div class="cards">
+            <div class="dash-card blue">
+                ⏱ Tempo Médio
+                <h2 id="tempoMedio"></h2>
+            </div>
+
+            <div class="dash-card green">
+                ⭐ Avaliação
+                <h2 id="avaliacaoMedia"></h2>
+            </div>
+
+            <div class="dash-card red">
+                ⚠️ Atrasados
+                <h2 id="atrasados"></h2>
+            </div>
+        </div>
+
+        <div class="charts">
+            <div class="chart-box">
+                <canvas id="graficoSistema"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="graficoPrioridade"></canvas>
+            </div>
+        </div>
+
+        <h2>Chamados</h2>
+        <ul id="listaChamados"></ul>
+
+    </div>
+
+</div>
+
+<script>
+
+let chamados = [];
+
+function classificarPrioridade(impacto, tipo) {
+    if (impacto > 10) return "Alta";
+    if (tipo === "Erro") return "Média";
+    return "Baixa";
+}
+
+function criarChamado() {
+
+    let chamado = {
+        nome: document.getElementById("nome").value,
+        empresa: document.getElementById("empresa").value,
+        sistema: document.getElementById("sistema").value,
+        tipo: document.getElementById("tipo").value,
+        impacto: parseInt(document.getElementById("impacto").value),
+        prioridade: classificarPrioridade(
+            parseInt(document.getElementById("impacto").value),
+            document.getElementById("tipo").value
+        ),
+        tempo: Math.floor(Math.random() * 200),
+        avaliacao: Math.floor(Math.random() * 5) + 1
+    };
+
+    chamados.push(chamado);
+    atualizar();
+}
+
+function atualizar() {
+    mostrar();
+    dashboard();
+    graficos();
+}
+
+function mostrar() {
+    let lista = document.getElementById("listaChamados");
+    lista.innerHTML = "";
+
+    chamados.forEach(c => {
+        lista.innerHTML += `<li>${c.nome} - ${c.sistema} | ${c.prioridade}</li>`;
+    });
+}
+
+function dashboard() {
+    if (chamados.length === 0) return;
+
+    let tempo = 0, aval = 0, atras = 0;
+
+    chamados.forEach(c => {
+        tempo += c.tempo;
+        aval += c.avaliacao;
+        if (c.tempo > 120) atras++;
+    });
+
+    document.getElementById("tempoMedio").innerText =
+        (tempo / chamados.length).toFixed(1) + " min";
+
+    document.getElementById("avaliacaoMedia").innerText =
+        (aval / chamados.length).toFixed(1);
+
+    document.getElementById("atrasados").innerText = atras;
+}
+
+let c1, c2;
+
+function graficos() {
+
+    let s = { RHID:0, WPE:0, PTRP:0 };
+    let p = { Alta:0, Média:0, Baixa:0 };
+
+    chamados.forEach(c => {
+        s[c.sistema]++;
+        p[c.prioridade]++;
+    });
+
+    if (c1) c1.destroy();
+    if (c2) c2.destroy();
+
+    c1 = new Chart(document.getElementById("graficoSistema"), {
+        type: 'bar',
+        data: {
+            labels: ['RHID','WPE','PTRP'],
+            datasets: [{
+                label: "Chamados por Sistema",
+                data: [s.RHID, s.WPE, s.PTRP]
+            }]
+        }
+    });
+
+    c2 = new Chart(document.getElementById("graficoPrioridade"), {
+        type: 'pie',
+        data: {
+            labels: ['Alta','Média','Baixa'],
+            datasets: [{
+                data: [p.Alta, p.Média, p.Baixa]
+            }]
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>

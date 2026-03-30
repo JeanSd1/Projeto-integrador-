@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Chamados</title>
+</head>
+<body>
+    <h1>Sistema de Chamados</h1>
+    <form id="ticketForm">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="company">Empresa:</label>
+        <input type="text" id="company" name="company" required><br>
+
+        <label for="system">Sistema:</label>
+        <select id="system" name="system">
+            <option value="RHID">RHID</option>
+            <option value="WPE">WPE</option>
+            <option value="PTRP">PTRP</option>
+        </select><br>
+
+        <label for="problem_type">Tipo de Problema:</label>
+        <input type="text" id="problem_type" name="problem_type" required><br>
+
+        <label for="affected_people">Pessoas Afetadas:</label>
+        <input type="number" id="affected_people" name="affected_people" required><br>
+
+        <label for="description">Descrição:</label>
+        <textarea id="description" name="description" required></textarea><br>
+
+        <button type="submit">Criar Chamado</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('ticketForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: form.name.value,
+                company: form.company.value,
+                system: form.system.value,
+                problem_type: form.problem_type.value,
+                affected_people: parseInt(form.affected_people.value),
+                description: form.description.value
+            };
+
+            const response = await fetch('/create_ticket', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            form.reset();
+        });
+    </script>
+</body>
+</html>
